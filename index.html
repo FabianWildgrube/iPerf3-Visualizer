@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="./assets/css/iperffVisualizer_styles.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script type="application/javascript" src="./assets/js/Chart.bundle.min.js"></script>
+    <script type="application/javascript" src="./assets/js/visualize_iPerf.js"></script>
+
+    <title>iPerf Visualizer | V 0.1</title>
+</head>
+<body>
+    <header>
+        <h1>iPerf Visualizer | V 0.1</h1>
+    </header>
+
+    <div class="main">
+        <h1>iPerf Visualizing</h1>
+        <p>This is a first test for visualizing our iPerf data (output in json format from iPerf).</p>
+
+        <input name="myFile" id="fileDialog" type="file" accept="application/json">
+        <div id="testInfo"></div>
+
+        <div class="chart-container">
+            <canvas id="perfChart01" class="chart" width="1000" height="500"></canvas>
+        </div>
+
+    </div>
+</body>
+</html>
