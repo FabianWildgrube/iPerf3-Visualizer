@@ -1,4 +1,4 @@
-#iPerf3 Visualizer
+# iPerf3 Visualizer
 
 This is a small web application, that will let you visualize json-files created by calling
 ``iperf3 -c <server-ip> -J --logfile <filename.json>```
