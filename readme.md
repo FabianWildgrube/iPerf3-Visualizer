@@ -9,8 +9,8 @@ Chart.js is used to show all the measurements from your network test as a graph,
 
 Current status:
 - 
-* Basic json file upload and display working
+* Basic json file upload and display working (multiple files for multiple datasets within one graph possible)
 * no styling yet
 * no error handling yet
 
-<img src="/images/Screen Shot 2018-03-29 at 01.57.06.png">
+<img src="/images/Screen Shot 2018-03-30 at 03.26.49.png">
