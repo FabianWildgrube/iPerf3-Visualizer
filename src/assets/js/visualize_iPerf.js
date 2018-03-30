@@ -2,8 +2,10 @@ var informationDiv;
 var testStartSeconds;
 var iPerfData;
 
+var chartsContainer;
 
 window.addEventListener("load", function()  {
+    chartsContainer = document.getElementById('chartsContainer');
     informationDiv = document.getElementById('testInfo');
     var fileDialog = document.getElementById('fileDialog');
 
@@ -13,12 +15,36 @@ window.addEventListener("load", function()  {
                 alert("Please select at least one file!");
                 return;
             } else {
-                var reader = new FileReader();
-                reader.onload = function (ev) {
-                    iPerfData = JSON.parse(reader.result);
-                    main();
+                window.iPerfCharts.push({
+                    chart: undefined,
+                    raw_data_sets: [],
+                    datasets_names: []
+                });
+
+                for (var i = 0; i < fileDialog.files.length; i++){
+                    var file = fileDialog.files[i];
+                    const reader = new FileReader();
+                    reader.onload = function (ev) {
+                        window.iPerfCharts[window.nrOfCharts].raw_data_sets.push(JSON.parse(reader.result));
+                    };
+                    console.log("Reading file: " + file.name);
+                    reader.readAsText(file);
+                    window.iPerfCharts[window.nrOfCharts].datasets_names.push(file.name);
+                }
+
+                var waitForLoadTimeout = undefined;
+
+                var createChartIfAllDataIsLoaded = function () {
+                    console.log("Waiting for data to load");
+                    if (window.iPerfCharts[window.nrOfCharts].raw_data_sets.length === fileDialog.files.length){
+                        console.log("Data seems to have loaded");
+                        createChart();
+                    } else {
+                        waitForLoadTimeout = setTimeout(createChartIfAllDataIsLoaded, window.sleepLength);
+                    }
                 };
-                reader.readAsText(fileDialog.files[0]);
+
+                waitForLoadTimeout = setTimeout(createChartIfAllDataIsLoaded, window.sleepLength);
             }
         } else {
             alert('The File APIs are not fully supported in this browser.');
@@ -27,39 +53,58 @@ window.addEventListener("load", function()  {
     });
 });
 
-function main() {
-    testStartSeconds = moment.unix(iPerfData.start.timestamp.timesecs);
-    parseTestRunInfo(iPerfData.start, iPerfData.end);
-    var dataWithTimePoints = parseDataPoints(iPerfData.intervals);
-    var dataPoints = dataWithTimePoints.dataPoints;
-    var timePoints = dataWithTimePoints.timePoints;
-    paintChart(dataPoints, timePoints);
-}
 
-function newDate(days) {
-    return moment().add(days, 'd').toDate();
+function createChart() {
+    console.log("Creating chart");
+
+    var ctx = document.createElement('canvas');
+    chartsContainer.appendChild(ctx);
+    var newChart = new Chart(ctx, standardLineChartDefinition);
+
+    var raw_datasets = window.iPerfCharts[window.nrOfCharts].raw_data_sets;
+    var dataset_names = window.iPerfCharts[window.nrOfCharts].datasets_names;
+    var processed_datasets = [];
+    var titleString = "Chart of testruns: ";
+    var lengthOfLongestDataset = 0;
+
+    for (var i = 0; i < raw_datasets.length; i++){
+        var raw_dataset = raw_datasets[i];
+        var dataset_name = dataset_names[i].replace(/\.json/, '');
+        titleString += dataset_name + ", ";
+
+        var data_points = parseDataPoints(raw_dataset.intervals);
+        if (data_points.length > lengthOfLongestDataset) lengthOfLongestDataset = data_points.length;
+
+        var processed_dataset = {
+            label: dataset_name,
+            data: data_points,
+            borderWidth: window.lineChartBorderWidth,
+            backgroundColor: window.chartColors[i % window.chartColors.length].translucent,
+            borderColor: window.chartColors[i % window.chartColors.length].opaque,
+            pointRadius: window.lineChartPointRadius,
+            fill: true
+        };
+
+        processed_datasets.push(processed_dataset);
+    }
+
+    newChart.data.datasets = processed_datasets;
+    newChart.data.labels = range(0, lengthOfLongestDataset);
+    newChart.options.title.text = titleString;
+    newChart.update();
+
+    window.iPerfCharts[window.nrOfCharts].chart = newChart;
+    window.nrOfCharts++;
 }
 
 function parseDataPoints(intervalsData) {
-    var dataWithTimePoints = {
-        dataPoints: [],
-        timePoints: []
-    };
-
-    var timecounter = testStartSeconds;
-
-    var timeArray = [];
+    var dataPoints = [];
 
     for (var i = 0; i < intervalsData.length; i++) {
-        dataWithTimePoints.dataPoints.push(intervalsData[i].sum.bits_per_second/(1000*1000)); //MegaBits per Second
-        timecounter = timecounter.add(intervalsData[i].sum.seconds, "seconds");
-        dataWithTimePoints.timePoints.push(timecounter.toDate());
-        timecounter = moment(timecounter.toDate()); //create new copy, otherwise the whole array will point to the same date-object
+        dataPoints.push((intervalsData[i].sum.bits_per_second/(1000*1000)).toFixed(2)); //MegaBits per Second
     }
 
-    console.log(timeArray);
-
-    return dataWithTimePoints;
+    return dataPoints;
 }
 
 function parseTestRunInfo(startData, endData) {
@@ -77,24 +122,9 @@ function parseTestRunInfo(startData, endData) {
     informationDiv.appendChild(infoTable);
 }
 
-function createTableRow(rowtitle, rowdata_in){
-    var row = document.createElement('TR');
-    var rowHead = document.createElement('TD');
-    rowHead.innerHTML = rowtitle;
-    row.appendChild(rowHead);
 
-    for (var i = 0; i < rowdata_in.length; i++){
-        var rowData = document.createElement('TD');
-        rowData.innerHTML = rowdata_in[i];
-        row.appendChild(rowData);
-    }
-
-    return row;
-}
-
-function paintChart(datapoints, timepoints){
-    var ctx = document.getElementById('perfChart01').getContext('2d');
-
+/* NOT NEEDED ANYMORE */
+function paintChart(ctx, datapoints, timepoints){
     var chart01 = new Chart(ctx, {
         type: 'line',
 
