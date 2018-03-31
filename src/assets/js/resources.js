@@ -37,13 +37,10 @@ window.standardLineChartDefinition = {
     options: {
         scales: {
             xAxes: [{
-                type: 'time',
-                time: {
-                    unit: 'second'
-                },
+                type: 'linear',
                 scaleLabel: {
                     display: true,
-                    labelString: "Time"
+                    labelString: "Seconds"
                 }
             }],
             yAxes: [{

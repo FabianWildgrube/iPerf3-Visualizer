@@ -1,19 +1,14 @@
-var informationDiv;
-var testStartSeconds;
-var iPerfData;
-
 var chartsContainer;
 
 window.addEventListener("load", function()  {
     chartsContainer = document.getElementById('chartsContainer');
-    informationDiv = document.getElementById('testInfo');
     var fileDialog = document.getElementById('fileDialog');
 
-    fileDialog.addEventListener("change", function (ev) {
+    fileDialog.addEventListener("change", function () {
         if (window.File && window.FileReader && window.FileList && window.Blob) {
-            if (fileDialog.files.length == 0){
+            if (fileDialog.files.length === 0){
                 alert("Please select at least one file!");
-                return;
+
             } else {
                 window.iPerfCharts.push({
                     chart: undefined,
@@ -48,7 +43,7 @@ window.addEventListener("load", function()  {
             }
         } else {
             alert('The File APIs are not fully supported in this browser.');
-            return;
+
         }
     });
 });
@@ -56,13 +51,30 @@ window.addEventListener("load", function()  {
 
 function createChart() {
     console.log("Creating chart");
-
-    var ctx = document.createElement('canvas');
-    chartsContainer.appendChild(ctx);
-    var newChart = new Chart(ctx, standardLineChartDefinition);
-
     var raw_datasets = window.iPerfCharts[window.nrOfCharts].raw_data_sets;
     var dataset_names = window.iPerfCharts[window.nrOfCharts].datasets_names;
+
+    var chartContainer = document.createElement('div');
+    chartContainer.classList.add('chartContainer');
+
+    var infoBoxesContainer = document.createElement('div');
+    infoBoxesContainer.classList.add('infoBoxesContainer');
+    chartContainer.appendChild(infoBoxesContainer);
+
+    for (var k = 0; k < raw_datasets.length; k++){
+        //Create info box for each dataset
+        var testRunInfoBox = createTestrunInfoBox(raw_datasets[k], dataset_names[k].replace(/\.json/, ''), window.chartColors[k % window.chartColors.length].opaque);
+        testRunInfoBox.classList.add('infoBox');
+        infoBoxesContainer.appendChild(testRunInfoBox);
+    }
+    var clearDiv = document.createElement('div');
+    clearDiv.style.clear = 'both';
+    infoBoxesContainer.appendChild(clearDiv);
+
+    var ctx = document.createElement('canvas');
+    chartContainer.appendChild(ctx);
+    var newChart = new Chart(ctx, standardLineChartDefinition);
+
     var processed_datasets = [];
     var titleString = "Chart of testruns: ";
     var lengthOfLongestDataset = 0;
@@ -91,6 +103,8 @@ function createChart() {
     newChart.data.datasets = processed_datasets;
     newChart.data.labels = range(0, lengthOfLongestDataset);
     newChart.options.title.text = titleString;
+
+    chartsContainer.appendChild(chartContainer);
     newChart.update();
 
     window.iPerfCharts[window.nrOfCharts].chart = newChart;
@@ -107,63 +121,41 @@ function parseDataPoints(intervalsData) {
     return dataPoints;
 }
 
-function parseTestRunInfo(startData, endData) {
-    var testTitle = document.createElement('h4');
-    testTitle.innerHTML = "iPerf Testrun from " + startData.connected[0].local_host + ":" + startData.connected[0].local_port +
-                                        " to "  + startData.connected[0].remote_host + ":" + startData.connected[0].remote_port;
+function createTestrunInfoBox(raw_dataset, title, color) {
+    var startData = raw_dataset.start;
+    var endData = raw_dataset.end;
 
-    var infoTable = document.createElement('TABLE');
-    infoTable.appendChild(createTableRow("iPerf Version", [startData.version]));
-    infoTable.appendChild(createTableRow("Duration", [endData.sum_received.seconds.toFixed(2) + "s"]));
-    infoTable.appendChild(createTableRow("Started", [startData.timestamp.time]));
-    infoTable.appendChild(createTableRow("Transferred Bytes", [endData.sum_received.bytes]));
+    var date = startData.timestamp.time;
+    var source = startData.connected[0].local_host;
+    var destination = startData.connected[0].remote_host;
+    var data_sent = endData.sum_received.bytes;
+    var duration = endData.sum_received.seconds.toFixed(2);
+    var average_speed = (endData.sum_received.bits_per_second/(1000*1000)).toFixed(2);
 
-    informationDiv.appendChild(testTitle);
-    informationDiv.appendChild(infoTable);
+    var box = document.createElement('div');
+    box.style.borderColor = color;
+    
+    var title_h3 = document.createElement('h3');
+    title_h3.innerHTML = title;
+    title_h3.style.color = color;
+    box.appendChild(title_h3);
+
+    var date_p = document.createElement('p');
+    date_p.innerHTML = date;
+    date_p.classList.add('date');
+    box.appendChild(date_p);
+
+    var source_dest_p = document.createElement('p');
+    source_dest_p.innerHTML = 'From <span class="ip">' +  source + "</span>" + " to " + '<span class="ip">' +  destination + "</span>";
+    box.appendChild(source_dest_p);
+    
+    var data_sent_p = document.createElement('p');
+    data_sent_p.innerHTML = data_sent + " Bytes sent in " + duration + "s";
+    box.appendChild(data_sent_p);
+
+    var average_speed_p = document.createElement('p');
+    average_speed_p.innerHTML = "Average: " + average_speed + " Mbps";
+    box.appendChild(average_speed_p);
+    
+    return box;
 }
-
-
-/* NOT NEEDED ANYMORE */
-function paintChart(ctx, datapoints, timepoints){
-    var chart01 = new Chart(ctx, {
-        type: 'line',
-
-        data: {
-            labels: timepoints,
-            datasets: [{
-                label: 'Test Data',
-                data: datapoints,
-                borderWidth: 3,
-                borderColor: '#E1721C',
-                pointRadius: 5
-            }]
-        },
-        options: {
-            title: {
-                text: 'Time Tryout'
-            },
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        unit: 'second'
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: "Time"
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        min: 0
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: "MBits/s"
-                    }
-                }]
-            }
-        }
-    });
-}
-

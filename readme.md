@@ -13,4 +13,4 @@ Current status:
 * no styling yet
 * no error handling yet
 
-<img src="/images/Screen Shot 2018-03-30 at 03.26.49.png">
+<img src="/images/Screen Shot03.png">
