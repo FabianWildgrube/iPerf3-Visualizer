@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/iperffVisualizer_styles.css">
+    <link rel="stylesheet" href="assets/css/iperfVisualizer_styles.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script type="application/javascript" src="assets/js/moment.min.js"></script>
     <script type="application/javascript" src="assets/js/Chart.bundle.min.js"></script>
     <script type="application/javascript" src="assets/js/utils.js"></script>
     <script type="application/javascript" src="assets/js/resources.js"></script>
@@ -20,10 +20,12 @@
     </header>
 
     <div class="main">
-        <h1>iPerf Visualizing</h1>
-        <p>This is a first test for visualizing our iPerf data (output in json format from iPerf).</p>
+        <img src="assets/images/iPerfVis_Logo.png" />
+        <h1>iPerf Visualizer</h1>
+        <p>To see captured iPerf data in a graph, please upload a json file of your iPerf3 testrun.</p>
 
-        <input name="myFile" id="fileDialog" multiple="multiple" type="file" accept="application/json">
+        <div id="fileChooserContainer">
+        </div>
 
         <div id="chartsContainer"></div>
     </div>

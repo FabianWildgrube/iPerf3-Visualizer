@@ -4,8 +4,9 @@
 }
 
 body {
-    background: #f5f5f5;
+    background: linear-gradient(to right, rgba(40,49,226,1) 0%, rgba(0,113,212,1) 100%);
     font-family: 'Open Sans', sans-serif;
+    color: white;
 }
 
 header {
@@ -17,6 +18,8 @@ header {
     padding-top: 15px;
     padding-bottom: 15px;
     padding-left: 100px;
+    color: grey;
+    z-index: 100;
 }
 
 .main {
@@ -25,6 +28,44 @@ header {
     margin-left: auto;
     margin-right: auto;
     padding: 50px;
+    text-align: center;
+}
+
+.fileChooser {
+    margin-top: 20px;
+    border-radius: 5px;
+    border: 1px solid white;
+    position: relative;
+    height: 40px;
+    width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.fileChooser .infotext {
+    float: left;
+    z-index: 10;
+    padding: 8px 10px 0 10px;
+    overflow: scroll;
+    max-width: 200px;
+}
+
+.fileChooser .uploadButton {
+    float: right;
+    z-index: 10;
+    height: 25px;
+    padding: 8px 10px 8px 10px;
+    border-left: 1px solid white;
+}
+
+.fileChooser .uploadButton:hover {
+    cursor: pointer;
+}
+
+.fileChooser input[type='file'] {
+    opacity: 0;
+    z-index: 0;
+    position: absolute;
 }
 
 #chartsContainer {
@@ -37,10 +78,11 @@ header {
     background: white;
     box-shadow: 0px 0px 15px 2px rgba(0,0,0,0.2);
     padding: 20px;
+    color: grey;
 }
 
 .infoBoxesContainer {
-    margin-bottom: 20px;
+    margin-top: 20px;
     padding-left: 25px;
 }
 

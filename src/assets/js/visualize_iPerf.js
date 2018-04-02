@@ -2,7 +2,11 @@ var chartsContainer;
 
 window.addEventListener("load", function()  {
     chartsContainer = document.getElementById('chartsContainer');
-    var fileDialog = document.getElementById('fileDialog');
+
+    var initialFileChooserContainer = document.getElementById('fileChooserContainer');
+    initialFileChooserContainer.appendChild(createFileChooser());
+
+    var fileDialog = initialFileChooserContainer.getElementsByTagName('input')[0];
 
     fileDialog.addEventListener("change", function () {
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -49,19 +53,11 @@ window.addEventListener("load", function()  {
 });
 
 
-function createChart() {
-    console.log("Creating chart");
-    var raw_datasets = window.iPerfCharts[window.nrOfCharts].raw_data_sets;
-    var dataset_names = window.iPerfCharts[window.nrOfCharts].datasets_names;
-
-    var chartContainer = document.createElement('div');
-    chartContainer.classList.add('chartContainer');
-
+function createInfoBoxes(raw_datasets, dataset_names) {
     var infoBoxesContainer = document.createElement('div');
     infoBoxesContainer.classList.add('infoBoxesContainer');
-    chartContainer.appendChild(infoBoxesContainer);
 
-    for (var k = 0; k < raw_datasets.length; k++){
+    for (var k = 0; k < raw_datasets.length; k++) {
         //Create info box for each dataset
         var testRunInfoBox = createTestrunInfoBox(raw_datasets[k], dataset_names[k].replace(/\.json/, ''), window.chartColors[k % window.chartColors.length].opaque);
         testRunInfoBox.classList.add('infoBox');
@@ -71,9 +67,20 @@ function createChart() {
     clearDiv.style.clear = 'both';
     infoBoxesContainer.appendChild(clearDiv);
 
+    return infoBoxesContainer;
+}
+
+function createChart() {
+    console.log("Creating chart");
+    var raw_datasets = window.iPerfCharts[window.nrOfCharts].raw_data_sets;
+    var dataset_names = window.iPerfCharts[window.nrOfCharts].datasets_names;
+
+    var chartContainer = document.createElement('div');
+    chartContainer.classList.add('chartContainer');
+
     var ctx = document.createElement('canvas');
     chartContainer.appendChild(ctx);
-    var newChart = new Chart(ctx, standardLineChartDefinition);
+    var newChart = new Chart(ctx, window.standardLineChartDefinition);
 
     var processed_datasets = [];
     var titleString = "Chart of testruns: ";
@@ -101,11 +108,16 @@ function createChart() {
     }
 
     newChart.data.datasets = processed_datasets;
+    console.log("Datasets: " + newChart.data.datasets[0].data);
     newChart.data.labels = range(0, lengthOfLongestDataset);
+    console.log("Labels: " + newChart.data.labels);
     newChart.options.title.text = titleString;
 
     chartsContainer.appendChild(chartContainer);
     newChart.update();
+
+    var infoBoxesContainer = createInfoBoxes(raw_datasets, dataset_names);
+    chartContainer.appendChild(infoBoxesContainer);
 
     window.iPerfCharts[window.nrOfCharts].chart = newChart;
     window.nrOfCharts++;
@@ -115,7 +127,7 @@ function parseDataPoints(intervalsData) {
     var dataPoints = [];
 
     for (var i = 0; i < intervalsData.length; i++) {
-        dataPoints.push((intervalsData[i].sum.bits_per_second/(1000*1000)).toFixed(2)); //MegaBits per Second
+        dataPoints.push(intervalsData[i].sum.bits_per_second/(1000*1000)); //MegaBits per Second
     }
 
     return dataPoints;
