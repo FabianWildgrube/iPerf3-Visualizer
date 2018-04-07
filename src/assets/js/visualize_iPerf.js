@@ -4,15 +4,14 @@ window.addEventListener("load", function()  {
     chartsContainer = document.getElementById('chartsContainer');
 
     var initialFileChooserContainer = document.getElementById('fileChooserContainer');
-    initialFileChooserContainer.appendChild(createFileChooser());
+    initialFileChooserContainer.appendChild(createBigFileChooser(window.innerWidth*0.6, window.innerHeight*0.5 ));
+    initialFileChooserContainer.style.marginLeft = (window.innerWidth*0.2 - window.getComputedStyle(initialFileChooserContainer.parentElement).paddingLeft.replace("px", "")*2) + 'px';
+});
 
-    var fileDialog = initialFileChooserContainer.getElementsByTagName('input')[0];
-
-    fileDialog.addEventListener("change", function () {
+function addNewChartToPage(fileDialog, fileDialogContainer){
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             if (fileDialog.files.length === 0){
                 alert("Please select at least one file!");
-
             } else {
                 window.iPerfCharts.push({
                     chart: undefined,
@@ -37,7 +36,10 @@ window.addEventListener("load", function()  {
                     console.log("Waiting for data to load");
                     if (window.iPerfCharts[window.nrOfCharts].raw_data_sets.length === fileDialog.files.length){
                         console.log("Data seems to have loaded");
-                        createChart();
+                        fileDialogContainer.parentElement.removeChild(fileDialogContainer);
+                        var offset = createChart();
+                        window.scrollbars.visible = true;
+                        window.scrollBy(0, offset - 20);
                     } else {
                         waitForLoadTimeout = setTimeout(createChartIfAllDataIsLoaded, window.sleepLength);
                     }
@@ -49,8 +51,7 @@ window.addEventListener("load", function()  {
             alert('The File APIs are not fully supported in this browser.');
 
         }
-    });
-});
+}
 
 
 function createInfoBoxes(raw_datasets, dataset_names) {
@@ -68,6 +69,41 @@ function createInfoBoxes(raw_datasets, dataset_names) {
     infoBoxesContainer.appendChild(clearDiv);
 
     return infoBoxesContainer;
+}
+
+function createChartMenuBar(chartContainer){
+    var menuBarContainer = document.createElement('div');
+    menuBarContainer.classList.add('chartMenuBar');
+
+    var closeButton = document.createElement('button');
+    closeButton.innerHTML = 'Close';
+    closeButton.classList.add('hoverHand');
+    closeButton.addEventListener('click', function (ev) {
+        chartContainer.parentNode.removeChild(chartContainer);
+        window.scrollTo(0, 0);
+    });
+    menuBarContainer.appendChild(closeButton);
+
+    return menuBarContainer;
+}
+
+function createBigFileChooser(width, height) {
+    var newFileChooser = createFileChooser();
+
+    var bigFileChooserContainer = getPlaceHolderRectangle(width, height);
+    bigFileChooserContainer.appendChild(newFileChooser);
+
+    var newFileDialog = newFileChooser.getElementsByTagName('input')[0];
+    newFileDialog.addEventListener("change", function () {
+        addNewChartToPage(newFileDialog, bigFileChooserContainer);
+    });
+
+
+
+    var offsetTop = (height/2) - 42/2;
+    newFileChooser.style.marginTop = offsetTop + 'px';
+
+    return bigFileChooserContainer;
 }
 
 function createChart() {
@@ -108,9 +144,7 @@ function createChart() {
     }
 
     newChart.data.datasets = processed_datasets;
-    console.log("Datasets: " + newChart.data.datasets[0].data);
-    newChart.data.labels = range(0, lengthOfLongestDataset);
-    console.log("Labels: " + newChart.data.labels);
+    newChart.data.labels = range(0, lengthOfLongestDataset-1);
     newChart.options.title.text = titleString;
 
     chartsContainer.appendChild(chartContainer);
@@ -118,9 +152,17 @@ function createChart() {
 
     var infoBoxesContainer = createInfoBoxes(raw_datasets, dataset_names);
     chartContainer.appendChild(infoBoxesContainer);
+    chartContainer.appendChild(createChartMenuBar(chartContainer));
+
+    var newFileChooser = createBigFileChooser(chartContainer.clientWidth-20, chartContainer.clientHeight);
+    chartsContainer.appendChild(newFileChooser);
 
     window.iPerfCharts[window.nrOfCharts].chart = newChart;
     window.nrOfCharts++;
+
+    var offsetFromHeader = chartContainer.getBoundingClientRect().top - document.getElementById('header').getBoundingClientRect().height;
+
+    return offsetFromHeader;
 }
 
 function parseDataPoints(intervalsData) {

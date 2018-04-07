@@ -4,9 +4,14 @@
 }
 
 body {
-    background: linear-gradient(to right, rgba(40,49,226,1) 0%, rgba(0,113,212,1) 100%);
+    background: linear-gradient(to left, rgb(179, 65, 0) 0%, rgb(212, 93, 2) 100%);
     font-family: 'Open Sans', sans-serif;
     color: white;
+    height: 1500px;
+}
+
+.hoverHand:hover {
+    cursor: pointer;
 }
 
 header {
@@ -14,21 +19,36 @@ header {
     position: fixed;
     top: 0;
     box-shadow: 0px 2px 15px -1px rgba(0,0,0,0.5);
-    background: white;
-    padding-top: 15px;
-    padding-bottom: 15px;
+    background: #1354be;
+    padding-top: 10px;
+    padding-bottom: 10px;
     padding-left: 100px;
-    color: grey;
+    color: white;
     z-index: 100;
+}
+
+header h2 {
+    padding-left: 10px;
+    float: left;
+    margin-top: -2px;
+}
+
+#headerLogo {
+    height: 30px;
+    float:left;
 }
 
 .main {
     margin-top: 50px;
-    width: 80%;
+    width: 90%;
     margin-left: auto;
     margin-right: auto;
     padding: 50px;
     text-align: center;
+}
+
+#mainLogo {
+    width: 250px;
 }
 
 .fileChooser {
@@ -45,9 +65,10 @@ header {
 .fileChooser .infotext {
     float: left;
     z-index: 10;
-    padding: 8px 10px 0 10px;
-    overflow: scroll;
-    max-width: 200px;
+    padding: 8px 0px 0 10px;
+    overflow: hidden;
+    max-width: 190px;
+    text-overflow: ellipsis;
 }
 
 .fileChooser .uploadButton {
@@ -68,17 +89,82 @@ header {
     position: absolute;
 }
 
+.bigFileChooser {
+    width: 45%;
+    float: left;
+}
+
+.bigFileChooser .fileChooser {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+}
+
 #chartsContainer {
     margin-top: 20px;
 }
 
 /*************************************** Chart Instance ***********************************/
+.placeHolderRectangle {
+    position: relative;
+    float: left;
+    margin-left: 20px;
+}
+
+.placeHolderRectangle .topRight {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top: 1px white solid;
+    border-right: 1px white solid;
+    border-radius: 0 3px 0 0;
+    width: 20px;
+    height: 20px;
+}
+
+.placeHolderRectangle .bottomRight {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-bottom: 1px white solid;
+    border-right: 1px white solid;
+    border-radius: 0 0 3px 0;
+    width: 20px;
+    height: 20px;
+}
+
+.placeHolderRectangle .bottomLeft {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-bottom: 1px white solid;
+    border-left: 1px white solid;
+    border-radius: 0 0 0 3px;
+    width: 20px;
+    height: 20px;
+}
+
+.placeHolderRectangle .topLeft {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-top: 1px white solid;
+    border-left: 1px white solid;
+    border-radius: 3px 0 0 0;
+    width: 20px;
+    height: 20px;
+}
+
+
 .chartContainer {
     border-radius: 5px;
     background: white;
     box-shadow: 0px 0px 15px 2px rgba(0,0,0,0.2);
     padding: 20px;
     color: grey;
+    position: relative;
+    width: 45%;
+    float: left;
 }
 
 .infoBoxesContainer {
@@ -107,3 +193,8 @@ header {
     border: solid 1px black;
 }
 
+.chartMenuBar {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}

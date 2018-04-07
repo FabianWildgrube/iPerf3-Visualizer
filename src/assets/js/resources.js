@@ -4,20 +4,20 @@ window.chartColors =  [
             translucent: 'rgba(27, 70, 115, 0.4)'
         },
         {
-            opaque: 'rgb(227,18,92)',
-            translucent: 'rgba(227,18,92, 0.4)'
+            opaque: 'rgb(44,120,56)',
+            translucent: 'rgba(44,120,56, 0.4)'
         },
         {
-            opaque: 'rgb(16,42,69)',
-            translucent: 'rgba(16,42,69, 0.4)'
+            opaque: 'rgb(255,153,0)',
+            translucent: 'rgba(255,153,0, 0.4)'
         },
         {
             opaque: 'rgb(156,12,63)',
             translucent: 'rgba(156,12,63, 0.4)'
         },
         {
-            opaque: 'rgb(93,7,37)',
-            translucent: 'rgba(93,7,37, 0.4)'
+            opaque: 'rgb(33,145,178)',
+            translucent: 'rgba(33,145,178, 0.4)'
         }
     ];
 
@@ -100,4 +100,24 @@ function createFileChooser() {
     containerDiv.appendChild(uploadButton);
 
     return containerDiv;
+}
+
+function getPlaceHolderRectangle(width, height){
+    var containerdiv = document.createElement("div");
+    containerdiv.classList.add('placeHolderRectangle');
+    containerdiv.style.width = width + 'px';
+    containerdiv.style.height = height + 'px';
+
+    var heights = ['top', 'bottom'];
+    var sides = ['Right', 'Left'];
+
+    for (var i = 0; i < heights.length; i++) {
+        for (var j = 0; j < sides.length; j++) {
+            var cornerdiv = document.createElement("div");
+            cornerdiv.classList.add(heights[i] + sides[j]);
+            containerdiv.appendChild(cornerdiv);
+        }
+    }
+
+    return containerdiv;
 }
